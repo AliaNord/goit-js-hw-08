@@ -68,35 +68,37 @@ const gallery = document.querySelector(".gallery");
 
 gallery.addEventListener("click", handleClick);
 
-const imagesWithId = images.map((obj, index) => {
-  return { ...obj, id: index + 1 };
-});
+function createMarkup(arr) {
+  return arr
+    .map(
+      (image, index) => `
+      <li class="gallery-item">
+        <a class="gallery-link" href="${image.original}">
+          <img
+            class="gallery-image"
+            src="${image.preview}"
+            data-source="${image.original}"
+            alt="${image.description}"
+          />
+        </a>
+      </li>
+    `
+    )
+    .join("");
+}
 
-imagesWithId.forEach((image) => {
-  const liItem = document.createElement("li");
-  liItem.classList.add("list-item");
-  liItem.setAttribute("data-id", image.id);
-
-  const imageItem = document.createElement("img");
-  imageItem.setAttribute("src", image.preview);
-  imageItem.setAttribute("alt", image.description);
-
-  liItem.append(imageItem);
-  gallery.append(liItem);
-});
+gallery.insertAdjacentHTML("beforeend", createMarkup(images));
 
 function handleClick(event) {
-  if (event.target === event.currentTarget) {
+  if (!event.target.classList.contains("gallery-image")) {
     return;
   }
-  const currentImage = event.target.closest(".list-item");
-  const id = currentImage.dataset.id;
+  event.preventDefault();
 
-  const image = imagesWithId.find((image) => image.id === +id);
-
+  const imageSource = event.target.dataset.source;
   const instance = basicLightbox.create(`
-	<div class="modal">
-        <img src="${image.original}" alt="" class="origin-image">
+  <div class="modal">
+        <img src="${imageSource}" alt="" class="origin-image">
     </div>
   `);
 
